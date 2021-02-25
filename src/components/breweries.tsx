@@ -1,5 +1,4 @@
-import * as React from "react";
-import { getBreweries } from "../services";
+import { Link } from "react-router-dom";
 
 interface IBreweriesResponse {
   name: string;
@@ -11,48 +10,19 @@ interface IBrews {
   breweries: IBreweriesResponse[];
 }
 
-function getBrews(dispatch: React.Dispatch<React.SetStateAction<IBrews>>) {
-  dispatch({ status: "pending", breweries: [] });
-  return getBreweries("brooklyn").subscribe({
-    next: (res) => {
-      dispatch({ status: "resolved", breweries: res });
-    },
-    error: (err) => {
-      console.error(err);
-    },
-    complete: () => {
-      console.log("complete");
-    },
-  });
-}
-
-const INITIAL_STATE: IBrews = {
-  status: "idle",
-  breweries: [],
-};
-
-function State() {
-  const [{ status, breweries }, setBrews] = React.useState<IBrews>(
-    INITIAL_STATE
-  );
-
-  console.log({ breweries });
-
-  React.useEffect(() => {
-    const subscription = getBrews(setBrews);
-    return () => subscription.unsubscribe();
-  }, []);
-
+function Breweries({ status, breweries }: IBrews) {
   return (
-    <div>
-      <h1>Breweries</h1>
-      <ul>
-        {breweries.map((brewery) => (
-          <li key={brewery.id}>{brewery.name}</li>
+    <ul>
+      {status === "pending" && <li>Loading beers</li>}
+      {status === "failed" && <li>Sorry no beer for you</li>}
+      {status === "resolved" &&
+        breweries.map((brewery) => (
+          <li key={brewery.id}>
+            <Link to={`/brewery/${brewery.id}`}>{brewery.name}</Link>
+          </li>
         ))}
-      </ul>
-    </div>
+    </ul>
   );
 }
 
-export default State;
+export default Breweries;
