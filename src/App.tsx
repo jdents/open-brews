@@ -6,6 +6,7 @@ import City from "./routes/city";
 import State from "./routes/state";
 import CityInState from "./routes/city-in-state";
 import Brewery from "./routes/brewery";
+import Home from "./routes/home";
 
 function Nav() {
   return (
@@ -35,9 +36,7 @@ function App() {
         <Nav />
         <Switch>
           <Route exact path="/">
-            <div>
-              <h1>Lets drink find something to drink</h1>
-            </div>
+            <Home />
           </Route>
           <Route path="/brewery/:id">
             <Brewery />

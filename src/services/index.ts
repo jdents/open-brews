@@ -18,3 +18,11 @@ export function getBrewery(id: string) {
     map((res) => res.response)
   );
 }
+
+// https://api.openbrewerydb.org/breweries/search?query=dog
+
+export function queryBreweries(query: string) {
+  return ajax(
+    `https://api.openbrewerydb.org/breweries/search?query=${query}`
+  ).pipe(map((res) => res.response));
+}

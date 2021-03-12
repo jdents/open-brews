@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useParams, useRouteMatch } from "react-router";
+import { useParams } from "react-router";
 import Breweries from "../../components/breweries";
 import { getBreweriesByCity } from "../../services";
 
