@@ -1,5 +1,4 @@
 import React from "react";
-import Breweries from "./components/breweries";
 import "./App.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import City from "./routes/city";
