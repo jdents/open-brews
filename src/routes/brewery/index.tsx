@@ -15,9 +15,6 @@ function getBrews(
     error: (err) => {
       console.error(err);
     },
-    complete: () => {
-      console.log("complete");
-    },
   });
 }
 
