@@ -1,12 +1,16 @@
 import React from "react";
-import { IBreweriesResponse, queryBreweries } from "../../../services";
+import {
+  getBrewery,
+  IBreweriesResponse,
+  queryBreweries,
+} from "../../../services";
 
 export enum Types {
   requestBreweries = "requestBreweries",
   breweriesSucceed = "breweriesSucceed",
   breweriesFailed = "breweriesFailed",
   requestBrewery = "requestBrewery",
-  succeededBrewery = "succeededBrewery",
+  breweryResolved = "breweryResolved",
   failedBrewery = "failedBrewery",
 }
 
@@ -27,7 +31,27 @@ interface BreweriesFailed {
   payload: string;
 }
 
-export type Actions = RequestBreweries | BreweriesSucceed | BreweriesFailed;
+interface RequestBrewery {
+  type: Types.requestBrewery;
+}
+
+interface BreweryResolved {
+  type: Types.breweryResolved;
+  payload: IBreweriesResponse;
+}
+
+interface BreweryFailed {
+  type: Types.failedBrewery;
+  payload: string;
+}
+
+export type Actions =
+  | RequestBreweries
+  | BreweriesSucceed
+  | BreweriesFailed
+  | RequestBrewery
+  | BreweryResolved
+  | BreweryFailed;
 
 export function fetchBrews(dispatch: React.Dispatch<Actions>, query: string) {
   dispatch({ type: Types.requestBreweries });
@@ -39,5 +63,17 @@ export function fetchBrews(dispatch: React.Dispatch<Actions>, query: string) {
       }),
     error: (err) =>
       dispatch({ type: Types.breweriesFailed, payload: "You messed up" }),
+  });
+}
+
+export function fetchBrew(dispatch: React.Dispatch<Actions>, id: string) {
+  dispatch({ type: Types.requestBrewery });
+  return getBrewery(id).subscribe({
+    next: (payload) => {
+      dispatch({ type: Types.breweryResolved, payload });
+    },
+    error: (err) => {
+      dispatch({ type: Types.failedBrewery, payload: "You failed" });
+    },
   });
 }

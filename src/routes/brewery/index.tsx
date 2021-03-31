@@ -1,60 +1,38 @@
 import * as React from "react";
 
-import { getBrewery } from "../../services";
 import { useParams } from "react-router-dom";
-
-function getBrews(
-  dispatch: React.Dispatch<React.SetStateAction<IBrews>>,
-  id: string
-) {
-  dispatch((prev) => ({ ...prev, status: "pending" }));
-  return getBrewery(id).subscribe({
-    next: (res) => {
-      dispatch({ status: "resolved", brewery: res });
-    },
-    error: (err) => {
-      console.error(err);
-    },
-  });
-}
-
-interface IBreweryResponse {
-  name: string;
-  id: number;
-}
-
-interface IBrews {
-  status: "idle" | "pending" | "resolved" | "failed";
-  brewery: IBreweryResponse | null;
-}
-
-const INITIAL_STATE: IBrews = {
-  status: "idle",
-  brewery: null,
-};
+import { useBrewery, useBreweryDispatchContext } from "../../stores/breweries";
+import { fetchBrew } from "../../stores/breweries/actions";
+import { IStatus } from "../../types";
 
 function Brewery() {
   const { id } = useParams<{ id: string }>();
-  const [{ status, brewery }, setBrews] = React.useState<IBrews>(INITIAL_STATE);
+  const { brewery, status } = useBrewery(parseInt(id, 10));
+  const dispatch = useBreweryDispatchContext();
 
   React.useEffect(() => {
-    const subscription = getBrews(setBrews, id);
-    return () => subscription.unsubscribe();
-  }, [id]);
+    if (!brewery) {
+      fetchBrew(dispatch, id);
+    }
+  }, [brewery, id, dispatch]);
 
-  if (status === "pending" || status === "idle") {
+  if (status === IStatus.pending) {
     return <div>Getting beers...</div>;
   }
-  if (status === "failed") {
+  if (status === IStatus.failed) {
     return <div>Failed to get you beers...</div>;
   }
 
-  return (
-    <div>
-      <h1>{brewery?.name}</h1>
-      <pre>{JSON.stringify(brewery, null, 2)}</pre>
-    </div>
-  );
+  if (status === IStatus.succeeded) {
+    return (
+      <div>
+        <h1>{brewery?.name}</h1>
+        <pre>{JSON.stringify(brewery, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  return <div>Getting beers...</div>;
 }
 
 export default Brewery;

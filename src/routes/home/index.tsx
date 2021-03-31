@@ -5,7 +5,9 @@ import SimpleSearchInput from "../../components/simple-search-input";
 import useQuery from "../../hooks/useQuery";
 import {
   useBreweryDispatchContext,
+  useBreweryList,
   useBreweryStateContext,
+  useListIds,
 } from "../../stores/breweries";
 import { fetchBrews } from "../../stores/breweries/actions";
 
@@ -14,10 +16,10 @@ function Home() {
   const state = query.get("state");
   const search = query.get("search");
   const history = useHistory();
-  const breweries = useBreweryStateContext();
+  const { status } = useBreweryStateContext();
   const dispatch = useBreweryDispatchContext();
 
-  console.log({ breweries });
+  const breweries = useBreweryList(search || "");
 
   React.useEffect(() => {
     if (search) {
@@ -43,7 +45,7 @@ function Home() {
         handleSubmit={handleSearch}
       />
       <h2>{search}</h2>
-      {/* {search && <Breweries status={status} breweries={breweries} />} */}
+      {search && <Breweries status={status} breweries={breweries || []} />}
     </div>
   );
 }

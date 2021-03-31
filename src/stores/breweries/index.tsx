@@ -7,6 +7,7 @@ type IBreweryList = { [query: string]: number[] };
 
 interface IBreweryStateContext {
   status: IStatus;
+  getBreweryStatus: IStatus;
   byId: { [id: string]: IBreweriesResponse };
   list: IBreweryList;
   error: string | null;
@@ -16,6 +17,7 @@ type IBreweryDispatchContext = React.Dispatch<Actions>;
 
 const INITIAL_STATE: IBreweryStateContext = {
   status: IStatus.idle,
+  getBreweryStatus: IStatus.idle,
   byId: {},
   list: {},
   error: null,
@@ -62,6 +64,25 @@ function reducer(
         },
         byId,
       };
+    case Types.requestBrewery:
+      return {
+        ...state,
+        getBreweryStatus: IStatus.pending,
+      };
+    case Types.breweryResolved:
+      return {
+        ...state,
+        getBreweryStatus: IStatus.succeeded,
+        byId: {
+          ...state.byId,
+          [action.payload.id]: action.payload,
+        },
+      };
+    case Types.failedBrewery:
+      return {
+        ...state,
+        getBreweryStatus: IStatus.failed,
+      };
     default:
       return state;
   }
@@ -73,6 +94,9 @@ export default function BreweryProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = React.useReducer(reducer, INITIAL_STATE);
+
+  console.log("Breweries State:", state);
+
   return (
     <BreweriesDispatchContext.Provider value={dispatch}>
       <BreweriesStateContext.Provider value={state}>
@@ -96,4 +120,29 @@ export function useBreweryDispatchContext() {
     throw new Error("Bonk");
   }
   return dispatch;
+}
+
+export function useListIds(query: string): number[] | undefined {
+  const { list } = useBreweryStateContext();
+  return list[query];
+}
+
+interface IUserBrewery {
+  status: IStatus;
+  brewery: IBreweriesResponse | undefined;
+}
+export function useBrewery(id: number): IUserBrewery {
+  const { byId, getBreweryStatus } = useBreweryStateContext();
+  return {
+    status: getBreweryStatus,
+    brewery: byId[id],
+  };
+}
+
+export function useBreweryList(
+  query: string
+): IBreweriesResponse[] | undefined {
+  const ids = useListIds(query);
+  const { byId } = useBreweryStateContext();
+  return ids?.map((id) => byId[id]);
 }

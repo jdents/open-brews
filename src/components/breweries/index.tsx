@@ -12,7 +12,6 @@ interface IBrews {
 }
 
 function Breweries({ status, breweries }: IBrews) {
-  console.log(status, breweries);
   return (
     <ul>
       {status === IStatus.pending && <li>Loading beers</li>}
