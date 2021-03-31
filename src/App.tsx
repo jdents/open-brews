@@ -6,6 +6,7 @@ import State from "./routes/state";
 import CityInState from "./routes/city-in-state";
 import Brewery from "./routes/brewery";
 import Home from "./routes/home";
+import BreweryProvider from "./stores/breweries";
 
 function Nav() {
   return (
@@ -30,28 +31,30 @@ function Nav() {
 
 function App() {
   return (
-    <div className="App">
-      <Router>
-        <Nav />
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/brewery/:id">
-            <Brewery />
-          </Route>
-          <Route path="/city/:city">
-            <City />
-          </Route>
-          <Route path="/location/:state/:city">
-            <CityInState />
-          </Route>
-          <Route path="/state/:state">
-            <State />
-          </Route>
-        </Switch>
-      </Router>
-    </div>
+    <BreweryProvider>
+      <div className="App">
+        <Router>
+          <Nav />
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/brewery/:id">
+              <Brewery />
+            </Route>
+            <Route path="/city/:city">
+              <City />
+            </Route>
+            <Route path="/location/:state/:city">
+              <CityInState />
+            </Route>
+            <Route path="/state/:state">
+              <State />
+            </Route>
+          </Switch>
+        </Router>
+      </div>
+    </BreweryProvider>
   );
 }
 

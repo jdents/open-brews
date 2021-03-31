@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { IStatus } from "../../types";
 
 interface IBreweriesResponse {
   name: string;
@@ -6,16 +7,17 @@ interface IBreweriesResponse {
 }
 
 interface IBrews {
-  status: "idle" | "pending" | "resolved" | "failed";
+  status: IStatus;
   breweries: IBreweriesResponse[];
 }
 
 function Breweries({ status, breweries }: IBrews) {
+  console.log(status, breweries);
   return (
     <ul>
-      {status === "pending" && <li>Loading beers</li>}
-      {status === "failed" && <li>Sorry no beer for you</li>}
-      {status === "resolved" &&
+      {status === IStatus.pending && <li>Loading beers</li>}
+      {status === IStatus.failed && <li>Sorry no beer for you</li>}
+      {status === IStatus.succeeded &&
         breweries.map((brewery) => (
           <li key={brewery.id}>
             <Link to={`/brewery/${brewery.id}`}>{brewery.name}</Link>

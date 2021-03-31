@@ -2,6 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router";
 import Breweries from "../../components/breweries";
 import { getBreweriesByState } from "../../services";
+import { IStatus } from "../../types";
 
 interface IBreweriesResponse {
   name: string;
@@ -9,7 +10,7 @@ interface IBreweriesResponse {
 }
 
 interface IBrews {
-  status: "idle" | "pending" | "resolved" | "failed";
+  status: IStatus;
   breweries: IBreweriesResponse[];
 }
 
@@ -17,10 +18,10 @@ function getBrews(
   dispatch: React.Dispatch<React.SetStateAction<IBrews>>,
   city: string
 ) {
-  dispatch({ status: "pending", breweries: [] });
+  dispatch({ status: IStatus.pending, breweries: [] });
   return getBreweriesByState(city).subscribe({
     next: (res) => {
-      dispatch({ status: "resolved", breweries: res });
+      dispatch({ status: IStatus.succeeded, breweries: res });
     },
     error: (err) => {
       console.error(err);
@@ -29,7 +30,7 @@ function getBrews(
 }
 
 const INITIAL_STATE: IBrews = {
-  status: "idle",
+  status: IStatus.idle,
   breweries: [],
 };
 
