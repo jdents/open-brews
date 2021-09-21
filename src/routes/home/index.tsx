@@ -1,53 +1,46 @@
-import * as React from "react";
-import { Redirect, useHistory } from "react-router";
-import Breweries from "../../components/breweries";
+import { useAtom } from "jotai";
+import { queryAtoms } from "../../atoms";
 import SimpleSearchInput from "../../components/simple-search-input";
-import useQuery from "../../hooks/useQuery";
-import {
-  useBreweryDispatchContext,
-  useBreweryList,
-  useBreweryStateContext,
-  useListIds,
-} from "../../stores/breweries";
-import { fetchBrews } from "../../stores/breweries/actions";
+import * as React from "react";
+import { Link } from "react-router-dom";
+
+const { queryAtom, breweriesAtom } = queryAtoms();
 
 function Home() {
-  const query = useQuery();
-  const state = query.get("state");
-  const search = query.get("search");
-  const history = useHistory();
-  const { status } = useBreweryStateContext();
-  const dispatch = useBreweryDispatchContext();
-
-  const breweries = useBreweryList(search || "");
-
-  React.useEffect(() => {
-    if (search) {
-      const subscription = fetchBrews(dispatch, search);
-      return () => subscription.unsubscribe();
-    }
-  }, [search, dispatch]);
-
-  function handleSearch(query: string) {
-    history.push({ search: `?search=${query}` });
-  }
-
-  if (state) {
-    return <Redirect to={`/state/${state}`} />;
-  }
+  const [query, setQuery] = useAtom(queryAtom);
+  const [breweries] = useAtom(breweriesAtom);
 
   return (
     <div>
-      <h1>Lets drink find something to drink</h1>
       <SimpleSearchInput
-        initialQuery={search || ""}
-        placeholder="Search for a brewery"
-        handleSubmit={handleSearch}
+        initialQuery={query}
+        placeholder="search"
+        handleSubmit={setQuery}
       />
-      <h2>{search}</h2>
-      {search && <Breweries status={status} breweries={breweries || []} />}
+      <ul>
+        {breweries &&
+          breweries.map((brewery) => (
+            <li key={brewery.id}>
+              <Link to={`/brewery/${brewery.id}`}>{brewery.name}</Link>
+            </li>
+          ))}
+      </ul>
     </div>
   );
 }
 
 export default Home;
+
+export function HomeFallback() {
+  const [query] = useAtom(queryAtom);
+  return (
+    <div>
+      <SimpleSearchInput
+        initialQuery={query}
+        placeholder="search"
+        handleSubmit={() => {}}
+      />
+      <div>Fetching...</div>
+    </div>
+  );
+}

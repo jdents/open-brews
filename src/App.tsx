@@ -1,12 +1,8 @@
-import React from "react";
+import * as React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import City from "./routes/city";
-import State from "./routes/state";
-import CityInState from "./routes/city-in-state";
-import Brewery from "./routes/brewery";
-import Home from "./routes/home";
-import BreweryProvider from "./stores/breweries";
+import Home, { HomeFallback } from "./routes/home";
+import Brewery, { BreweryFallback } from "./routes/brewery";
 
 function Nav() {
   return (
@@ -31,30 +27,34 @@ function Nav() {
 
 function App() {
   return (
-    <BreweryProvider>
-      <div className="App">
-        <Router>
-          <Nav />
+    <div className="App">
+      <Router>
+        <Nav />
+        <React.Suspense fallback="Loading">
           <Switch>
             <Route exact path="/">
-              <Home />
+              <React.Suspense fallback={<HomeFallback />}>
+                <Home />
+              </React.Suspense>
             </Route>
             <Route path="/brewery/:id">
-              <Brewery />
+              <React.Suspense fallback={<BreweryFallback />}>
+                <Brewery />
+              </React.Suspense>
             </Route>
             <Route path="/city/:city">
-              <City />
+              <h1>City </h1>
             </Route>
             <Route path="/location/:state/:city">
-              <CityInState />
+              <h1>CityInState </h1>
             </Route>
             <Route path="/state/:state">
-              <State />
+              <h1>State </h1>
             </Route>
           </Switch>
-        </Router>
-      </div>
-    </BreweryProvider>
+        </React.Suspense>
+      </Router>
+    </div>
   );
 }
 

@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
+import { IBreweriesResponse } from "../../atoms";
 import { IStatus } from "../../types";
-
-interface IBreweriesResponse {
-  name: string;
-  id: number;
-}
 
 interface IBrews {
   status: IStatus;
